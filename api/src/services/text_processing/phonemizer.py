@@ -34,8 +34,26 @@ class EspeakBackend(PhonemizerBackend):
         Args:
             language: Language code ('en-us' or 'en-gb')
         """
+        # Force use of regular espeak instead of espeak-ng
+        # Try to find espeak executable, fallback to auto-detection
+        import shutil
+        import logging
+        
+        logger = logging.getLogger(__name__)
+        
+        espeak_executable = shutil.which('espeak')
+        if espeak_executable:
+            logger.info(f"Using espeak executable: {espeak_executable}")
+        else:
+            # If espeak is not found, let phonemizer auto-detect (may use espeak-ng)
+            logger.warning("espeak executable not found, phonemizer will auto-detect (may use espeak-ng)")
+            espeak_executable = None
+        
         self.backend = phonemizer.backend.EspeakBackend(
-            language=language, preserve_punctuation=True, with_stress=True
+            language=language, 
+            preserve_punctuation=True, 
+            with_stress=True,
+            executable=espeak_executable
         )
 
         self.language = language
