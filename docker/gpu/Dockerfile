@@ -6,16 +6,16 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y \
     python3.10 \
     python3-venv \
-    espeak-ng \
-    espeak-ng-data \
+    espeak \
+    espeak-data \
     git \
     libsndfile1 \
     curl \
     ffmpeg \
     g++ \
  && apt-get clean && rm -rf /var/lib/apt/lists/* \
- && mkdir -p /usr/share/espeak-ng-data \
- && ln -s /usr/lib/*/espeak-ng-data/* /usr/share/espeak-ng-data/
+ && mkdir -p /usr/share/espeak-data \
+ && ln -s /usr/lib/*/espeak-data/* /usr/share/espeak-data/
 
 # Install UV using the installer script
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
@@ -34,8 +34,8 @@ WORKDIR /app
 COPY --chown=appuser:appuser pyproject.toml ./pyproject.toml
 
 ENV PHONEMIZER_ESPEAK_PATH=/usr/bin \
-    PHONEMIZER_ESPEAK_DATA=/usr/share/espeak-ng-data \
-    ESPEAK_DATA_PATH=/usr/share/espeak-ng-data
+    PHONEMIZER_ESPEAK_DATA=/usr/share/espeak-data \
+    ESPEAK_DATA_PATH=/usr/share/espeak-data
 
 # Install dependencies with GPU extras (using cache mounts)
 RUN --mount=type=cache,target=/root/.cache/uv \

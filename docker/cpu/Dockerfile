@@ -2,8 +2,8 @@ FROM python:3.10-slim
 
 # Install dependencies and check espeak location
 RUN apt-get update && apt-get install -y \
-    espeak-ng \
-    espeak-ng-data \
+    espeak \
+    espeak-data \
     git \
     libsndfile1 \
     curl \
@@ -11,8 +11,8 @@ RUN apt-get update && apt-get install -y \
     g++ \
 && apt-get clean \
 && rm -rf /var/lib/apt/lists/* \
-&& mkdir -p /usr/share/espeak-ng-data \
-&& ln -s /usr/lib/*/espeak-ng-data/* /usr/share/espeak-ng-data/
+&& mkdir -p /usr/share/espeak-data \
+&& ln -s /usr/lib/*/espeak-data/* /usr/share/espeak-data/
 
 # Install UV using the installer script
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
@@ -52,8 +52,8 @@ ENV PYTHONUNBUFFERED=1 \
     UV_LINK_MODE=copy \
     USE_GPU=false \
     PHONEMIZER_ESPEAK_PATH=/usr/bin \
-    PHONEMIZER_ESPEAK_DATA=/usr/share/espeak-ng-data \
-    ESPEAK_DATA_PATH=/usr/share/espeak-ng-data
+    PHONEMIZER_ESPEAK_DATA=/usr/share/espeak-data \
+    ESPEAK_DATA_PATH=/usr/share/espeak-data
 
 ENV DOWNLOAD_MODEL=true
 # Download model if enabled

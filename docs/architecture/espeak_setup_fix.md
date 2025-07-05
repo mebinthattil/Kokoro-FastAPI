@@ -1,12 +1,12 @@
-# ESpeak-NG Setup Fix
+# ESpeak Setup Fix
 
 ## Issue Description
 
 Users are reporting two distinct errors:
 
-1. Missing espeak-ng-data/phontab file:
+1. Missing espeak-data/phontab file:
 ```
-Error processing file '/home/runner/work/espeakng-loader/espeakng-loader/espeak-ng/_dynamic/share/espeak-ng-data/phontab': No such file or directory.
+Error processing file '/home/runner/work/espeak-loader/espeak-loader/espeak/_dynamic/share/espeak-data/phontab': No such file or directory.
 ```
 
 2. Invalid pipeline state:
@@ -16,7 +16,7 @@ Error generating speech: The object is in an invalid state.
 
 ## Root Cause Analysis
 
-### 1. ESpeak-NG Data Issue
+### 1. ESpeak Data Issue
 
 The dependency chain has changed:
 ```
@@ -24,12 +24,12 @@ Before:
 kokoro-fastapi (phonemizer 3.3.0) -> kokoro -> misaki -> phonemizer
 
 After:
-kokoro-fastapi -> kokoro -> misaki -> phonemizer-fork + espeakng-loader
+kokoro-fastapi -> kokoro -> misaki -> phonemizer-fork + espeak-loader
 ```
 
 The issue arises because:
-1. misaki now uses espeakng-loader to manage espeak paths
-2. espeakng-loader looks for data in its package directory
+1. misaki now uses espeak-loader to manage espeak paths
+2. espeak-loader looks for data in its package directory
 3. We have a direct dependency on phonemizer 3.3.0 that conflicts
 
 ### 2. Pipeline State Issue
@@ -37,7 +37,7 @@ The "invalid state" error occurs due to device mismatch in pipeline creation.
 
 ## Solution
 
-### 1. For ESpeak-NG Data
+### 1. For ESpeak Data
 
 Update dependencies and environment:
 
@@ -46,13 +46,13 @@ Update dependencies and environment:
 - "phonemizer==3.3.0",  # Remove this
 ```
 
-2. Let misaki handle phonemizer-fork and espeakng-loader
+2. Let misaki handle phonemizer-fork and espeak-loader
 
 3. Set environment variable in Dockerfile:
 ```dockerfile
 ENV PHONEMIZER_ESPEAK_PATH=/usr/bin \
-    PHONEMIZER_ESPEAK_DATA=/usr/share/espeak-ng-data \
-    ESPEAK_DATA_PATH=/usr/share/espeak-ng-data  # Add this
+    PHONEMIZER_ESPEAK_DATA=/usr/share/espeak-data \
+    ESPEAK_DATA_PATH=/usr/share/espeak-data  # Add this
 ```
 
 This approach:
@@ -79,7 +79,7 @@ pipeline = backend._get_pipeline(pipeline_lang_code)
 
 2. Update Dockerfiles:
    - Add ESPEAK_DATA_PATH environment variable
-   - Keep existing espeak-ng setup
+   - Keep existing espeak setup
 
 3. Update tts_service.py:
    - Use backend's pipeline management
@@ -87,14 +87,14 @@ pipeline = backend._get_pipeline(pipeline_lang_code)
 
 ## Testing
 
-1. Test espeak-ng functionality:
+1. Test espeak functionality:
    ```bash
    # Verify environment variables
    echo $ESPEAK_DATA_PATH
    echo $PHONEMIZER_ESPEAK_DATA
    
    # Check data directory
-   ls /usr/share/espeak-ng-data
+   ls /usr/share/espeak-data
    ```
 
 2. Test pipeline state:
@@ -104,7 +104,7 @@ pipeline = backend._get_pipeline(pipeline_lang_code)
 
 ## Success Criteria
 
-1. No espeak-ng-data/phontab file errors
+1. No espeak-data/phontab file errors
 2. No invalid state errors
 3. Consistent behavior across platforms
 4. Successful CI/CD pipeline runs
@@ -112,13 +112,13 @@ pipeline = backend._get_pipeline(pipeline_lang_code)
 ## Future Considerations
 
 1. Potential PR to misaki:
-   - Add fallback mechanism if espeakng-loader fails
+   - Add fallback mechanism if espeak-loader fails
    - Make path configuration more flexible
    - Add better error messages
 
 2. Environment Variable Documentation:
    - Document ESPEAK_DATA_PATH requirement
-   - Explain interaction with espeakng-loader
+   - Explain interaction with espeak-loader
    - Provide platform-specific setup instructions
 
 ## Notes
