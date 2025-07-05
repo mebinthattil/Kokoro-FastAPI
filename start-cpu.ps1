@@ -1,4 +1,4 @@
-$env:PHONEMIZER_ESPEAK_LIBRARY="C:\Program Files\eSpeak NG\libespeak-ng.dll"
+$env:PHONEMIZER_ESPEAK_LIBRARY="C:\Program Files\eSpeak\libespeak.dll"
 $env:PYTHONUTF8=1
 $Env:PROJECT_ROOT="$pwd"
 $Env:USE_GPU="false"
